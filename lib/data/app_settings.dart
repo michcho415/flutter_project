@@ -8,7 +8,4 @@ class AppData
   int numberOfTactsToRecord;
   int metrum = 4;
 
-  String getBeats() => beatsPerMinute.toString();
-  String getTacts() => numberOfTactsToRecord.toString();
-
 }

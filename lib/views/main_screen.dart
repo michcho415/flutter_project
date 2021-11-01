@@ -28,15 +28,19 @@ class _MainScreenState extends State<MainScreen>{
             onPressed: getDataFromSettings
             ),
           ),
-        body: Container(
-          child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-              child: Column(
-            children: [Text("Beats per minute: ${data.getBeats()} \nTacts: ${data.getTacts()}")]
-            )
-          )
-        ),
-      );
+        body: Padding(
+                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Text("Welcome to Looper Application!\n",
+                        style: Theme.of(context).textTheme.headline4,
+                        textAlign: TextAlign.center),
+                    ]
+                  )
+                )
+              )
+            );
 
   }
 

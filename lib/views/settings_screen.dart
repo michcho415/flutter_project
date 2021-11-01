@@ -66,7 +66,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             appData.numberOfTactsToRecord = value!;
                           })
                         },
-                        items: <int>[2, 3].map<DropdownMenuItem<int>>((int? value) {
+                        items: <int>[2, 3, 4].map<DropdownMenuItem<int>>((int? value) {
                           return DropdownMenuItem<int>(
                             value: value,
                             child: Text(value.toString()),
@@ -86,7 +86,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         decoration:  InputDecoration(
                             errorText: isTextFieldValid ? null : errorText,
                             hintText: "Tempo in BPM",
-                            labelText: "Current: ${appData.getBeats()}"
+                            labelText: "Current: ${appData.beatsPerMinute}"
                           ),
                         )
                       )
