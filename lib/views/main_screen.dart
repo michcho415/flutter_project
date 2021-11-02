@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/data/app_settings.dart';
 import 'package:flutter_project/views/settings_screen.dart';
+import 'package:flutter_project/widgets/looper.dart';
 
 class MainScreen extends StatefulWidget
 {
@@ -36,6 +37,7 @@ class _MainScreenState extends State<MainScreen>{
                       Text("Welcome to Looper Application!\n",
                         style: Theme.of(context).textTheme.headline4,
                         textAlign: TextAlign.center),
+                      Looper(appData: data),
                     ]
                   )
                 )
