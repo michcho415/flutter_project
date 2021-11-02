@@ -33,7 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Flexible(
               child: Column(
                 children: [
-                Row(
+                    Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                         Text("Metrum: ", textScaleFactor: 1.1,),
@@ -54,44 +54,49 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         Text("/ 4", textScaleFactor: 1.1,)
                      ]
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("Tacts to record: ", textScaleFactor: 1.1,),
-                    DropdownButton<int>(
-                        value: appData.numberOfTactsToRecord,
-                        onChanged: (int? value) => {
-                          setState(() {
-                            appData.numberOfTactsToRecord = value!;
-                          })
-                        },
-                        items: <int>[2, 3, 4].map<DropdownMenuItem<int>>((int? value) {
-                          return DropdownMenuItem<int>(
-                            value: value,
-                            child: Text(value.toString()),
-                          );
-                        }).toList(),
+                  ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                    child:Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text("Tacts to record: ", textScaleFactor: 1.1,),
+                        DropdownButton<int>(
+                          value: appData.numberOfTactsToRecord,
+                          onChanged: (int? value) => {
+                            setState(() {
+                              appData.numberOfTactsToRecord = value!;
+                            })
+                          },
+                          items: <int>[2, 3, 4].map<DropdownMenuItem<int>>((int? value) {
+                            return DropdownMenuItem<int>(
+                              value: value,
+                              child: Text(value.toString()),
+                            );
+                          }).toList(),
                     ),
                   ],
+                )
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text("Tempo: ", textScaleFactor: 1.1,),
-                      Flexible( child: TextField(
-
-                        onChanged: validateTextField,
-                        keyboardType: TextInputType.number,
-                        decoration:  InputDecoration(
-                            errorText: isTextFieldValid ? null : errorText,
-                            hintText: "Tempo in BPM",
-                            labelText: "Current: ${appData.beatsPerMinute}"
-                          ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                    child:Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text("Tempo: ", textScaleFactor: 1.1,),
+                        Flexible(
+                            child: TextField(
+                            onChanged: validateTextField,
+                            keyboardType: TextInputType.number,
+                            decoration:  InputDecoration(
+                              errorText: isTextFieldValid ? null : errorText,
+                              hintText: "Tempo in BPM",
+                              labelText: "Current: ${appData.beatsPerMinute}"
+                              ),
+                            )
                         )
-                      )
-
-                    ],
+                      ],
+                    )
                 )
               ]
           )
