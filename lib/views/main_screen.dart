@@ -51,6 +51,7 @@ class _MainScreenState extends State<MainScreen>{
 
      setState(() {
        data = result;
+
      });
   }
 
