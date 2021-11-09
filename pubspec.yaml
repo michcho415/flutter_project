@@ -36,6 +36,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   microphone: ^0.1.0
   audioplayers: ^0.20.1
+  record: ^3.0.0
+  flutter_sound_lite: ^8.4.2
+  permission_handler: ^8.2.6
+  path_provider: ^2.0.6
 
 dev_dependencies:
   flutter_test:
