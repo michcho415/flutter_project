@@ -15,6 +15,7 @@ import 'package:flutter_sound_lite/flutter_sound.dart';
 import 'package:flutter_sound_lite/public/flutter_sound_recorder.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 
 enum LooperState{
@@ -40,7 +41,7 @@ class _LooperState extends State<Looper> {
   FlutterSoundRecorder flutterRecorder = FlutterSoundRecorder();
   FlutterSoundPlayer flutterPlayer = FlutterSoundPlayer();
 
-  AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+  AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.MEDIA_PLAYER);
   AudioPlayer looperPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioCache? audioCache;
   AudioCache? looperAudioCache;
@@ -93,6 +94,9 @@ class _LooperState extends State<Looper> {
       category: SessionCategory.playback
     );
 
+    audioPlayer.setReleaseMode(ReleaseMode.LOOP);
+    getTempDir();
+
   }
 
   @override
@@ -142,15 +146,17 @@ class _LooperState extends State<Looper> {
       }
   }
 
-  Future<void> preRecording() async {
-    await askForPermissions();
-    await audioPlayer.setReleaseMode(ReleaseMode.LOOP);
-    initTempoSetup();
+  Future<void> getTempDir() async{
     var tempDir = await getTemporaryDirectory();
     recordedPath = '${tempDir.path}/recording.aac';
-    startCounting = new Timer(Duration(milliseconds: 2*tactDuration), Recording);
-    startCounting2 = new Timer(Duration(milliseconds: 2*tactDuration-300), startRecording);
-    metronomeLoop = new Timer.periodic(Duration(milliseconds: oneTickDuration), onTick);
+  }
+
+  Future<void> preRecording() async {
+    await askForPermissions();
+    initTempoSetup();
+    startCounting =  Timer(Duration(milliseconds: 2*tactDuration), Recording);
+    startCounting2 = Timer(Duration(milliseconds: 2*tactDuration-300), startRecording);
+    metronomeLoop = Timer.periodic(Duration(milliseconds: oneTickDuration), onTick);
     audioCache!.play(path);
 
     setState(() {
@@ -189,7 +195,7 @@ class _LooperState extends State<Looper> {
 
   Future<void> Recording() async {
     //await flutterRecorder.startRecorder(toFile: 'foo.aac', sampleRate: 44100, bitRate: 256000, codec: Codec.aacADTS);
-    recordTimer = new Timer(Duration(milliseconds: beatDuration), Recorded);
+    recordTimer = Timer(Duration(milliseconds: beatDuration), Recorded);
     setState((){
       startCounting?.cancel();
       state = LooperState.Recording;
@@ -204,15 +210,12 @@ class _LooperState extends State<Looper> {
         recordedPath,
         isLocal: true,
     );
-
-    //await audioCache?.play(recordedPath);
-    //audioCache!.play('met.mp3');
-
   }
 
   Future<void> stopRecording() async {
-    await flutterRecorder.stopRecorder();
+    recordedPath = (await flutterRecorder.stopRecorder())!;
     await audioPlayer.stop();
+    final dir = Directory(recordedPath);
     metronomeLoop?.cancel();
     startCounting2?.cancel();
     startCounting?.cancel();
@@ -228,18 +231,15 @@ class _LooperState extends State<Looper> {
 
   Future<void> Recorded() async
   {
-    //await audioPlayer.seek(Duration(milliseconds: 320));
     recordedPath = (await flutterRecorder.stopRecorder())!;
-   /*await audioPlayer.play(
-        'foo.mp3',
-        isLocal: true,
-    );*/
-    //await audioCache!.play('foo.aac');
+    //await audioPlayer.seek(Duration(milliseconds: 297));
+    await audioPlayer.play(
+      recordedPath,
+      isLocal: true,
+    );
     metronomeLoop?.cancel();
-    //audioCache!.play('met.mp3');
     startCounting?.cancel();
     state = LooperState.Playing;
-    await audioPlayer.seek(Duration(milliseconds: 297));
     playingTimer = Timer.periodic(Duration(milliseconds: beatDuration), Playing);
     setState(() {
       isStopButtonVisible = true;
