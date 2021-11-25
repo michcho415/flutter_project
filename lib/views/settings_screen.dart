@@ -30,8 +30,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: Padding(
           padding: EdgeInsets.all(30.0),
-          child: Flexible(
-              child: Column(
+          child: Column(
                 children: [
                     Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -100,7 +99,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 )
               ]
           )
-      )
+
       )
     );
   }
