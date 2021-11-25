@@ -153,7 +153,7 @@ class _LooperState extends State<Looper> {
 
   Future<void> preRecording() async {
     await askForPermissions();
-    initTempoSetup();
+    await initTempoSetup();
     startCounting =  Timer(Duration(milliseconds: 2*tactDuration), Recording);
     startCounting2 = Timer(Duration(milliseconds: 2*tactDuration-300), startRecording);
     metronomeLoop = Timer.periodic(Duration(milliseconds: oneTickDuration), onTick);
@@ -169,7 +169,7 @@ class _LooperState extends State<Looper> {
     });
   }
 
-  void initTempoSetup()
+  Future<void> initTempoSetup() async
   {
     setState(() {
       oneTickDuration = (1000 * 60 / widget.appData.beatsPerMinute).toInt();
