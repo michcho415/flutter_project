@@ -42,9 +42,9 @@ class _LooperState extends State<Looper> {
   FlutterSoundPlayer flutterPlayer = FlutterSoundPlayer();
 
   AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.MEDIA_PLAYER);
-  AudioPlayer looperPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+  AudioPlayer metronomePlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioCache? audioCache;
-  AudioCache? looperAudioCache;
+  AudioCache? metronomeAudioCache;
 
   final recorder = Record();
 
@@ -64,7 +64,7 @@ class _LooperState extends State<Looper> {
   Timer? playingTimer;
 
   String recordingStateString = "";
-  String path = 'met.mp3';
+  final String path = 'met.mp3';
   String recordedPath = 'recording.aac';
 
   int counter = 1;
@@ -78,7 +78,7 @@ class _LooperState extends State<Looper> {
     super.initState();
 
     audioCache = AudioCache(fixedPlayer: audioPlayer);
-    looperAudioCache = AudioCache(fixedPlayer: looperPlayer);
+    metronomeAudioCache = AudioCache(fixedPlayer: metronomePlayer);
 
     flutterRecorder.openAudioSession(
       focus: AudioFocus.requestFocusAndStopOthers,
@@ -104,8 +104,8 @@ class _LooperState extends State<Looper> {
     audioPlayer.release();
     audioPlayer.dispose();
 
-    looperPlayer.release();
-    looperPlayer.dispose();
+    metronomePlayer.release();
+    metronomePlayer.dispose();
 
     flutterRecorder.closeAudioSession();
     flutterPlayer.closeAudioSession();
@@ -179,7 +179,8 @@ class _LooperState extends State<Looper> {
   }
 
   Future<void> onTick(Timer t) async {
-    await audioCache!.play(path);
+    //await metronomePlayer.play(path, isLocal: true);
+    await metronomeAudioCache!.play(path);
     setState(() {
       counter += 1;
       if(counter == widget.appData.metrum + 1)
