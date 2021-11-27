@@ -41,7 +41,7 @@ class _LooperState extends State<Looper> {
   FlutterSoundRecorder flutterRecorder = FlutterSoundRecorder();
   FlutterSoundPlayer flutterPlayer = FlutterSoundPlayer();
 
-  AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.MEDIA_PLAYER);
+  AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioPlayer metronomePlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioCache? audioCache;
   AudioCache? metronomeAudioCache;
@@ -64,9 +64,9 @@ class _LooperState extends State<Looper> {
   Timer? playingTimer;
 
   String recordingStateString = "";
-  final String path = 'met.mp3';
+  final String path = './met.mp3';
   String recordedPath = 'recording.aac';
-
+  late File metronomeSound;
   int counter = 1;
 
 
@@ -79,6 +79,11 @@ class _LooperState extends State<Looper> {
 
     audioCache = AudioCache(fixedPlayer: audioPlayer);
     metronomeAudioCache = AudioCache(fixedPlayer: metronomePlayer);
+
+    setTempDirForMet();
+
+
+
 
     flutterRecorder.openAudioSession(
       focus: AudioFocus.requestFocusAndStopOthers,
@@ -94,7 +99,7 @@ class _LooperState extends State<Looper> {
       category: SessionCategory.playback
     );
 
-    audioPlayer.setReleaseMode(ReleaseMode.LOOP);
+    audioPlayer.setReleaseMode(ReleaseMode.STOP);
     getTempDir();
 
   }
@@ -135,6 +140,13 @@ class _LooperState extends State<Looper> {
 
   }
 
+  Future<void> setTempDirForMet() async {
+    var tempDir =  await getTemporaryDirectory();
+    metronomeSound = new File('${tempDir.path}/met.mp3');
+    ByteData bytes = await rootBundle.load('assets/met.mp3');
+    metronomeSound.writeAsBytes((bytes).buffer.asInt8List());
+  }
+
   Future<void> askForPermissions() async {
     if( await Permission.storage.isDenied
         || await Permission.microphone.isDenied
@@ -154,10 +166,11 @@ class _LooperState extends State<Looper> {
   Future<void> preRecording() async {
     await askForPermissions();
     await initTempoSetup();
+    final iable = await metronomeAudioCache?.load(path);
     startCounting =  Timer(Duration(milliseconds: 2*tactDuration), Recording);
     startCounting2 = Timer(Duration(milliseconds: 2*tactDuration-300), startRecording);
     metronomeLoop = Timer.periodic(Duration(milliseconds: oneTickDuration), onTick);
-    audioCache!.play(path);
+    await metronomePlayer.play(metronomeSound.path, isLocal: true);
 
     setState(() {
       isRecordButtonVisible = false;
@@ -179,8 +192,7 @@ class _LooperState extends State<Looper> {
   }
 
   Future<void> onTick(Timer t) async {
-    //await metronomePlayer.play(path, isLocal: true);
-    await metronomeAudioCache!.play(path);
+    await metronomePlayer.play(metronomeSound.path, isLocal: true);
     setState(() {
       counter += 1;
       if(counter == widget.appData.metrum + 1)
@@ -196,6 +208,7 @@ class _LooperState extends State<Looper> {
 
   Future<void> Recording() async {
     //await flutterRecorder.startRecorder(toFile: 'foo.aac', sampleRate: 44100, bitRate: 256000, codec: Codec.aacADTS);
+    //await flutterRecorder.startRecorder(toFile: 'foo.aac', sampleRate: 44100, bitRate: 256000, codec: Codec.aacADTS);
     recordTimer = Timer(Duration(milliseconds: beatDuration), Recorded);
     setState((){
       startCounting?.cancel();
@@ -206,17 +219,21 @@ class _LooperState extends State<Looper> {
 
   Future<void> Playing(Timer t) async{
     //await audioPlayer.stop();
-    await audioPlayer.seek(Duration(milliseconds: 297));
+    //await audioPlayer.seek(Duration(milliseconds: 300));
     await audioPlayer.play(
         recordedPath,
         isLocal: true,
     );
+    //await audioPlayer.resume();
   }
 
   Future<void> stopRecording() async {
-    recordedPath = (await flutterRecorder.stopRecorder())!;
+    await flutterRecorder.stopRecorder();
+    await metronomePlayer.stop();
     await audioPlayer.stop();
-    final dir = Directory(recordedPath);
+    //await audioPlayer.release();
+    //final dir = File(recordedPath);
+    //dir.delete();
     metronomeLoop?.cancel();
     startCounting2?.cancel();
     startCounting?.cancel();
@@ -234,13 +251,15 @@ class _LooperState extends State<Looper> {
   {
     recordedPath = (await flutterRecorder.stopRecorder())!;
     //await audioPlayer.seek(Duration(milliseconds: 297));
-    await audioPlayer.play(
+    /*await audioPlayer.play(
       recordedPath,
       isLocal: true,
-    );
+    );*/
     metronomeLoop?.cancel();
     startCounting?.cancel();
+    startCounting2?.cancel();
     state = LooperState.Playing;
+    //audioPlayer.setUrl(recordedPath, isLocal: true);
     playingTimer = Timer.periodic(Duration(milliseconds: beatDuration), Playing);
     setState(() {
       isStopButtonVisible = true;
