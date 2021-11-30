@@ -50,7 +50,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   child: Player(widget.appData, audioFilePath)
               ),
               Flexible(
-                flex: 1,
+                flex: 3,
                 child: Padding(
                     padding: const EdgeInsets.only(top: 20),
                     child:FutureBuilder(
@@ -87,7 +87,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       onTap: () => {
                         changeRecording(index)
                       },
-                      child: ListTile(title: Text(fileNames[index].toString())),
+                      child: Card(child: ListTile(
+                        title: Text(fileNames[index].toString()),
+                      )),
                     );
                   }
               ),
