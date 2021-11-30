@@ -198,13 +198,13 @@ class _LooperState extends State<Looper> {
 
   Future<void> startRecording() async {
     String savePath = saveDirectory!.path + '/' + recordingFilename;
-    await flutterRecorder.startRecorder(toFile: savePath, sampleRate: 44100, bitRate: 256000, codec: Codec.aacADTS);
+    //await flutterRecorder.startRecorder(toFile: savePath, sampleRate: 44100, bitRate: 256000, codec: Codec.aacADTS);
     startCounting2?.cancel();
   }
 
   Future<void> recording() async {
-    //await flutterRecorder.startRecorder(toFile: 'foo.aac', sampleRate: 44100, bitRate: 256000, codec: Codec.aacADTS);
-    //await flutterRecorder.startRecorder(toFile: 'foo.aac', sampleRate: 44100, bitRate: 256000, codec: Codec.aacADTS);
+    String savePath = saveDirectory!.path + '/' + recordingFilename;
+    await flutterRecorder.startRecorder(toFile: savePath, sampleRate: 44100, bitRate: 256000, codec: Codec.aacADTS);
     recordTimer = Timer(Duration(milliseconds: beatDuration), recorded);
     setState((){
       startCounting?.cancel();
@@ -215,7 +215,6 @@ class _LooperState extends State<Looper> {
 
   Future<void> playing(Timer t) async{
     await audioPlayer.stop();
-    //await audioPlayer.seek(Duration(milliseconds: 300));
     await audioPlayer.play(
         recordedPath,
         isLocal: true,
