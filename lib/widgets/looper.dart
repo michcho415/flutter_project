@@ -41,7 +41,7 @@ class _LooperState extends State<Looper> {
   FlutterSoundRecorder flutterRecorder = FlutterSoundRecorder();
   FlutterSoundPlayer flutterPlayer = FlutterSoundPlayer();
 
-  AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+  AudioPlayer audioPlayer = AudioPlayer(mode: PlayerMode.MEDIA_PLAYER);
   AudioPlayer metronomePlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioCache? audioCache;
   AudioCache? metronomeAudioCache;
@@ -64,8 +64,11 @@ class _LooperState extends State<Looper> {
   Timer? playingTimer;
 
   String recordingStateString = "";
+
+  Directory? saveDirectory;
   final String path = './met.mp3';
   String recordedPath = 'recording.aac';
+  String recordingFilename = "recording.aac";
   late File metronomeSound;
   int counter = 1;
 
@@ -81,13 +84,14 @@ class _LooperState extends State<Looper> {
     metronomeAudioCache = AudioCache(fixedPlayer: metronomePlayer);
 
     setTempDirForMet();
+    setSaveDirectory();
 
 
 
 
     flutterRecorder.openAudioSession(
       focus: AudioFocus.requestFocusAndStopOthers,
-      mode: SessionMode.modeMeasurement,
+      mode: SessionMode.modeDefault,
       device: AudioDevice.speaker,
       category: SessionCategory.record,
     );
@@ -147,6 +151,10 @@ class _LooperState extends State<Looper> {
     metronomeSound.writeAsBytes((bytes).buffer.asInt8List());
   }
 
+  Future<void> setSaveDirectory() async {
+    saveDirectory = await getExternalStorageDirectory();
+  }
+
   Future<void> askForPermissions() async {
     if( await Permission.storage.isDenied
         || await Permission.microphone.isDenied
@@ -166,6 +174,7 @@ class _LooperState extends State<Looper> {
   Future<void> preRecording() async {
     await askForPermissions();
     await initTempoSetup();
+    await _displayTextInputDialog(context);
     final iable = await metronomeAudioCache?.load(path);
     startCounting =  Timer(Duration(milliseconds: 2*tactDuration), Recording);
     startCounting2 = Timer(Duration(milliseconds: 2*tactDuration-300), startRecording);
@@ -184,11 +193,9 @@ class _LooperState extends State<Looper> {
 
   Future<void> initTempoSetup() async
   {
-    setState(() {
-      oneTickDuration = (1000 * 60 / widget.appData.beatsPerMinute).toInt();
-      tactDuration = (oneTickDuration * widget.appData.metrum).toInt();
-      beatDuration = (widget.appData.numberOfTactsToRecord * tactDuration).toInt(); // in ms
-    });
+    oneTickDuration = (1000 * 60 / widget.appData.beatsPerMinute).toInt();
+    tactDuration = (oneTickDuration * widget.appData.metrum).toInt();
+    beatDuration = (widget.appData.numberOfTactsToRecord * tactDuration).toInt(); // in ms
   }
 
   Future<void> onTick(Timer t) async {
@@ -202,7 +209,8 @@ class _LooperState extends State<Looper> {
   }
 
   Future<void> startRecording() async {
-    await flutterRecorder.startRecorder(toFile: 'foo.aac', sampleRate: 44100, bitRate: 256000, codec: Codec.aacADTS);
+    String savePath = saveDirectory!.path + '/' + recordingFilename;
+    await flutterRecorder.startRecorder(toFile: savePath, sampleRate: 44100, bitRate: 256000, codec: Codec.aacADTS);
     startCounting2?.cancel();
   }
 
@@ -218,7 +226,7 @@ class _LooperState extends State<Looper> {
   }
 
   Future<void> Playing(Timer t) async{
-    //await audioPlayer.stop();
+    await audioPlayer.stop();
     //await audioPlayer.seek(Duration(milliseconds: 300));
     await audioPlayer.play(
         recordedPath,
@@ -259,13 +267,45 @@ class _LooperState extends State<Looper> {
     startCounting?.cancel();
     startCounting2?.cancel();
     state = LooperState.Playing;
-    //audioPlayer.setUrl(recordedPath, isLocal: true);
+    await audioPlayer.setUrl(recordedPath, isLocal: true);
     playingTimer = Timer.periodic(Duration(milliseconds: beatDuration), Playing);
     setState(() {
       isStopButtonVisible = true;
       isRecordButtonVisible = false;
       recordingStateString = "Playing loop.";
     });
+  }
+
+  Future<void> _displayTextInputDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Recording name'),
+            content: TextField(
+              onChanged: (value) {
+                setState(() {
+                  recordingFilename = value;
+                  recordingFilename += '.aac';
+                });
+              },
+              decoration: const InputDecoration(hintText: "Provide record name"),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                color: Colors.green,
+                textColor: Colors.white,
+                child: const Text('OK'),
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+
+            ],
+          );
+        });
   }
 
 }

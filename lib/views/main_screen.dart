@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/data/app_settings.dart';
+import 'package:flutter_project/views/player_screen.dart';
 import 'package:flutter_project/views/settings_screen.dart';
 import 'package:flutter_project/widgets/looper.dart';
 
@@ -33,11 +34,21 @@ class _MainScreenState extends State<MainScreen>{
                 padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                 child: Center(
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text("Welcome to Looper Application!\n",
                         style: Theme.of(context).textTheme.headline4,
                         textAlign: TextAlign.center),
                       Looper(appData: data),
+                      Flexible(
+                        flex: 1,
+                        child: ElevatedButton.icon(
+                          onPressed: goToPlayer,
+                          icon: const Icon(Icons.list),
+                          label: const Text("List of Recordings")
+                        )
+                      )
                     ]
                   )
                 )
@@ -53,6 +64,10 @@ class _MainScreenState extends State<MainScreen>{
        data = result;
 
      });
+  }
+
+  Future<void> goToPlayer() async {
+    final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => PlayerScreen(data)));
   }
 
 }
