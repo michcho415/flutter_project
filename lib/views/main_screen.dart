@@ -8,13 +8,10 @@ class MainScreen extends StatefulWidget
 {
   const MainScreen({Key? key}) : super(key: key);
 
-
   @override
   State<StatefulWidget> createState() => _MainScreenState();
 
 }
-
-
 
 class _MainScreenState extends State<MainScreen>{
 
@@ -24,16 +21,16 @@ class _MainScreenState extends State<MainScreen>{
   Widget build(BuildContext context) {
       return Scaffold(
         appBar: AppBar(
-          title: Text("Looper"),
+          title: const Text("Looper"),
           leading: IconButton(
-            icon: Icon(Icons.settings),
+            icon: const Icon(Icons.settings),
             onPressed: getDataFromSettings
             ),
           ),
         body: Padding(
-                padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                child: Center(
-                  child: Column(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            child: Center(
+                child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -52,22 +49,20 @@ class _MainScreenState extends State<MainScreen>{
                     ]
                   )
                 )
-              )
-            );
+        )
+      );
 
   }
 
   Future<void> getDataFromSettings() async {
      final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen(appData: data)));
-
      setState(() {
        data = result;
-
      });
   }
 
   Future<void> goToPlayer() async {
-    final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => PlayerScreen(data)));
+    await Navigator.push(context, MaterialPageRoute(builder: (context) => PlayerScreen(data)));
   }
 
 }

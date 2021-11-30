@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 
 class AppData
 {
-  AppData(int this.metrum, {required int this.beatsPerMinute, required int this.numberOfTactsToRecord});
+  AppData(this.metrum, {required this.beatsPerMinute, required this.numberOfTactsToRecord});
 
   int beatsPerMinute;
   int numberOfTactsToRecord;

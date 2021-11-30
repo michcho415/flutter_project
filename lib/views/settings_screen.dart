@@ -22,20 +22,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text("Settings"),
+          title: const Text("Settings"),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () => Navigator.pop(context, appData),
           ),
       ),
       body: Padding(
-          padding: EdgeInsets.all(30.0),
+          padding: const EdgeInsets.all(30.0),
           child: Column(
                 children: [
                     Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                        Text("Metrum: ", textScaleFactor: 1.1,),
+                        const Text("Metrum: ", textScaleFactor: 1.1,),
                         DropdownButton<int>(
                             value: appData.metrum,
                             onChanged: (int? value) => {
@@ -51,15 +51,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             }).toList(),
 
                         ),
-                        Text("/ 4", textScaleFactor: 1.1,)
+                        const Text("/ 4", textScaleFactor: 1.1,)
                      ]
                   ),
                 Padding(
-                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                     child:Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text("Tacts to record: ", textScaleFactor: 1.1,),
+                        const Text("Tacts to record: ", textScaleFactor: 1.1,),
                         DropdownButton<int>(
                           value: appData.numberOfTactsToRecord,
                           onChanged: (int? value) => {
@@ -78,11 +78,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 )
                 ),
                 Padding(
-                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                     child:Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text("Tempo: ", textScaleFactor: 1.1,),
+                        const Text("Tempo: ", textScaleFactor: 1.1,),
                         Flexible(
                             child: TextField(
                             onChanged: validateTextField,

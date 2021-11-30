@@ -33,7 +33,6 @@ class _PlayerState extends State<Player> {
 
   @override
   void dispose() {
-
     audioPlayer.release();
     audioPlayer.dispose();
     super.dispose();
@@ -62,7 +61,6 @@ class _PlayerState extends State<Player> {
 
   Future<void> onPlay() async {
 
-    var result = widget.audioFilePath.isEmpty;
     if (widget.audioFilePath.isEmpty == true)
     {
       showDialog(
@@ -90,13 +88,6 @@ class _PlayerState extends State<Player> {
     setState(() {
       isStopButtonVisible = false;
       isPlayButtonVisible = true;
-    });
-  }
-
-  void setAudioPath(String audioPath)
-  {
-    setState(() {
-      widget.audioFilePath = audioPath;
     });
   }
 

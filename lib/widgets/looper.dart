@@ -27,7 +27,7 @@ enum LooperState{
 }
 
 class Looper extends StatefulWidget {
-  const Looper({Key? key, required AppData this.appData}) : super(key: key);
+  const Looper({Key? key, required this.appData}) : super(key: key);
 
   final AppData appData;
 
@@ -37,7 +37,6 @@ class Looper extends StatefulWidget {
 
 class _LooperState extends State<Looper> {
 
-  //final microphoneRecorder = MicrophoneRecorder()..init();
   FlutterSoundRecorder flutterRecorder = FlutterSoundRecorder();
   FlutterSoundPlayer flutterPlayer = FlutterSoundPlayer();
 
@@ -45,8 +44,6 @@ class _LooperState extends State<Looper> {
   AudioPlayer metronomePlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
   AudioCache? audioCache;
   AudioCache? metronomeAudioCache;
-
-  final recorder = Record();
 
   late LooperState state;
   bool isRecordButtonVisible = true;
@@ -86,9 +83,6 @@ class _LooperState extends State<Looper> {
     setTempDirForMet();
     setSaveDirectory();
 
-
-
-
     flutterRecorder.openAudioSession(
       focus: AudioFocus.requestFocusAndStopOthers,
       mode: SessionMode.modeDefault,
@@ -104,7 +98,6 @@ class _LooperState extends State<Looper> {
     );
 
     audioPlayer.setReleaseMode(ReleaseMode.STOP);
-    getTempDir();
 
   }
 
@@ -128,7 +121,7 @@ class _LooperState extends State<Looper> {
         children: [
           Center(child: Text(counter.toString(), textScaleFactor: 1.3,)),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 25),
+            padding: const EdgeInsets.symmetric(vertical: 25),
             child: Center(child: Text(recordingStateString.toString(), textScaleFactor: 1.3,))),
             Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -146,7 +139,7 @@ class _LooperState extends State<Looper> {
 
   Future<void> setTempDirForMet() async {
     var tempDir =  await getTemporaryDirectory();
-    metronomeSound = new File('${tempDir.path}/met.mp3');
+    metronomeSound = File('${tempDir.path}/met.mp3');
     ByteData bytes = await rootBundle.load('assets/met.mp3');
     metronomeSound.writeAsBytes((bytes).buffer.asInt8List());
   }
@@ -166,17 +159,11 @@ class _LooperState extends State<Looper> {
       }
   }
 
-  Future<void> getTempDir() async{
-    var tempDir = await getTemporaryDirectory();
-    recordedPath = '${tempDir.path}/recording.aac';
-  }
-
   Future<void> preRecording() async {
     await askForPermissions();
     await initTempoSetup();
     await _displayTextInputDialog(context);
-    final iable = await metronomeAudioCache?.load(path);
-    startCounting =  Timer(Duration(milliseconds: 2*tactDuration), Recording);
+    startCounting =  Timer(Duration(milliseconds: 2*tactDuration), recording);
     startCounting2 = Timer(Duration(milliseconds: 2*tactDuration-300), startRecording);
     metronomeLoop = Timer.periodic(Duration(milliseconds: oneTickDuration), onTick);
     await metronomePlayer.play(metronomeSound.path, isLocal: true);
@@ -202,8 +189,9 @@ class _LooperState extends State<Looper> {
     await metronomePlayer.play(metronomeSound.path, isLocal: true);
     setState(() {
       counter += 1;
-      if(counter == widget.appData.metrum + 1)
+      if(counter == widget.appData.metrum + 1) {
         counter = 1;
+      }
     });
 
   }
@@ -214,10 +202,10 @@ class _LooperState extends State<Looper> {
     startCounting2?.cancel();
   }
 
-  Future<void> Recording() async {
+  Future<void> recording() async {
     //await flutterRecorder.startRecorder(toFile: 'foo.aac', sampleRate: 44100, bitRate: 256000, codec: Codec.aacADTS);
     //await flutterRecorder.startRecorder(toFile: 'foo.aac', sampleRate: 44100, bitRate: 256000, codec: Codec.aacADTS);
-    recordTimer = Timer(Duration(milliseconds: beatDuration), Recorded);
+    recordTimer = Timer(Duration(milliseconds: beatDuration), recorded);
     setState((){
       startCounting?.cancel();
       state = LooperState.Recording;
@@ -225,23 +213,19 @@ class _LooperState extends State<Looper> {
     });
   }
 
-  Future<void> Playing(Timer t) async{
+  Future<void> playing(Timer t) async{
     await audioPlayer.stop();
     //await audioPlayer.seek(Duration(milliseconds: 300));
     await audioPlayer.play(
         recordedPath,
         isLocal: true,
     );
-    //await audioPlayer.resume();
   }
 
   Future<void> stopRecording() async {
     await flutterRecorder.stopRecorder();
     await metronomePlayer.stop();
     await audioPlayer.stop();
-    //await audioPlayer.release();
-    //final dir = File(recordedPath);
-    //dir.delete();
     metronomeLoop?.cancel();
     startCounting2?.cancel();
     startCounting?.cancel();
@@ -255,20 +239,15 @@ class _LooperState extends State<Looper> {
     });
   }
 
-  Future<void> Recorded() async
+  Future<void> recorded() async
   {
     recordedPath = (await flutterRecorder.stopRecorder())!;
-    //await audioPlayer.seek(Duration(milliseconds: 297));
-    /*await audioPlayer.play(
-      recordedPath,
-      isLocal: true,
-    );*/
     metronomeLoop?.cancel();
     startCounting?.cancel();
     startCounting2?.cancel();
     state = LooperState.Playing;
     await audioPlayer.setUrl(recordedPath, isLocal: true);
-    playingTimer = Timer.periodic(Duration(milliseconds: beatDuration), Playing);
+    playingTimer = Timer.periodic(Duration(milliseconds: beatDuration), playing);
     setState(() {
       isStopButtonVisible = true;
       isRecordButtonVisible = false;
@@ -292,9 +271,11 @@ class _LooperState extends State<Looper> {
               decoration: const InputDecoration(hintText: "Provide record name"),
             ),
             actions: <Widget>[
-              FlatButton(
-                color: Colors.green,
-                textColor: Colors.white,
+              ElevatedButton(
+                style: ButtonStyle(
+                  foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                  backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                ),
                 child: const Text('OK'),
                 onPressed: () {
                   setState(() {
@@ -302,7 +283,6 @@ class _LooperState extends State<Looper> {
                   });
                 },
               ),
-
             ],
           );
         });

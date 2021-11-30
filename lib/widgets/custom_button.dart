@@ -21,7 +21,7 @@ class _CustomButtonState extends State<CustomButton> {
     return Visibility(
       visible: widget.visible,
         child: Ink(
-        decoration: ShapeDecoration(
+        decoration: const ShapeDecoration(
             color: Colors.black54,
             shape: CircleBorder()
         ),

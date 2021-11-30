@@ -26,7 +26,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   void initState() {
-    getDirectory();
     getFilesWithSpecifiedType();
     super.initState();
   }
@@ -58,7 +57,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         future: _inFutureList(),
                         builder: (BuildContext context, AsyncSnapshot snapshot) {
                           if(snapshot.connectionState == ConnectionState.waiting){
-                            return Text('Data is loading...');
+                            return const Text('Data is loading...');
                           }
                           else{
                             return customBuild(context, snapshot);
@@ -120,13 +119,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
         }
     }
 
-  }
-
-  void getDirectory() async {
-
-    setState(() {
-
-    });
   }
 
   void changeRecording(int index)
